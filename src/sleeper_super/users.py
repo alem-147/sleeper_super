@@ -13,7 +13,7 @@ class User:
 
 def init_users(settings: Settings) -> None:
 
-    with sqlite3.connect("my_database.db") as conn:
+    with sqlite3.connect("sleeper_super.db") as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY,
