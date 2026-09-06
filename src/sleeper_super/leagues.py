@@ -37,4 +37,4 @@ if __name__ == "__main__":
     settings = Settings()
     with sqlite3.connect(settings.db_name) as conn:
         init_leagues(conn, settings)
-        print(get_leagues(conn).head())
+        print(get_leagues(conn))

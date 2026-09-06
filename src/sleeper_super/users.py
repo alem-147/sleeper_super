@@ -71,3 +71,21 @@ def get_rosters(conn: sqlite3.Connection, user_ids: list[int] | None = None) -> 
         params = tuple(user_ids)
 
     return pd.read_sql_query(query, conn, params=params)
+
+def roster2user(conn: sqlite3.Connection, league_id: int, roster_id: int) -> pd.DataFrame:
+
+    roster_query = """SELECT user_id FROM rosters
+        WHERE league_id = ? AND roster_id = ?
+    """
+    roster_row = conn.execute(roster_query, (league_id, roster_id)).fetchone()
+
+    user_id = roster_row[0] if roster_row is not None else None
+
+    if user_id is None:
+        return pd.DataFrame(columns=["id", "display_name"])
+
+    user_query = """SELECT * FROM users
+        WHERE id = ?
+    """
+    return pd.read_sql_query(user_query, conn, params=(user_id,))
+
