@@ -6,10 +6,6 @@ import pandas as pd
 
 from sleeper_super.config import Settings
 
-@dataclass
-class User:
-    id: int
-    display_name: str
 
 def init_users(conn: sqlite3.Connection, settings: Settings) -> None:
     conn.execute("""
