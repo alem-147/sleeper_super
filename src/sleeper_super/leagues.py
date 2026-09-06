@@ -10,7 +10,8 @@ def init_leagues(settings: Settings) -> None:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS leagues (
                 id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL
+                name TEXT NOT NULL,
+                season INTEGER NOT NULL
             )
         """)
 
@@ -21,11 +22,13 @@ def init_leagues(settings: Settings) -> None:
             league = httpx.get(f"https://api.sleeper.app/v1/league/{league_id}").json()
 
             conn.execute("""
-                INSERT INTO leagues(id, name) VALUES (?, ?)
+                INSERT INTO leagues(id, name, season) VALUES (?, ?, ?)
                 ON CONFLICT (id)
-                DO UPDATE SET name = excluded.name
+                DO UPDATE SET
+                    name = excluded.name,
+                    season = excluded.season
                 """,
-                (league["league_id"], league["name"])
+                (league["league_id"], league["name"], league["season"])
             )
 
 def get_leagues(settings: Settings) -> pd.DataFrame:
@@ -36,3 +39,7 @@ def get_leagues(settings: Settings) -> pd.DataFrame:
         )
     return df
 
+if __name__ == "__main__":
+    settings = Settings()
+    init_leagues(settings)
+    print(get_leagues(settings).head())
