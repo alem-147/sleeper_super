@@ -13,7 +13,7 @@ class User:
 
 def init_users(settings: Settings) -> None:
 
-    with sqlite3.connect("sleeper_super.db") as conn:
+    with sqlite3.connect(settings.db_name) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY,
@@ -37,12 +37,12 @@ def init_users(settings: Settings) -> None:
                 (user["user_id"], user["display_name"])
             )
 
-def get_users() -> None:
+def get_users(settings: Settings) -> pd.DataFrame:
 
-    with sqlite3.connect("my_database.db") as conn:
+    with sqlite3.connect(settings.db_name) as conn:
         df = pd.read_sql_query(
             "SELECT * FROM users",
             conn,
         )
-        print(df.head())
+    return df
 
