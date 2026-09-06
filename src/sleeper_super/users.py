@@ -37,6 +37,14 @@ def init_users(settings: Settings) -> None:
                 (user["user_id"], user["display_name"])
             )
 
+def get_users(settings: Settings) -> pd.DataFrame:
+    with sqlite3.connect(settings.db_name) as conn:
+        df = pd.read_sql_query(
+            "SELECT * FROM users",
+            conn,
+        )
+    return df
+
 def init_rosters(settings: Settings) -> None:
     with sqlite3.connect(settings.db_name) as conn:
         conn.execute("""
@@ -63,22 +71,17 @@ def init_rosters(settings: Settings) -> None:
                         user_id = excluded.user_id
                     """,
                     (roster["league_id"], roster["roster_id"], roster["owner_id"])
-                ) 
+                )
 
-def get_users(settings: Settings) -> pd.DataFrame:
-    with sqlite3.connect(settings.db_name) as conn:
-        df = pd.read_sql_query(
-            "SELECT * FROM users",
-            conn,
-        )
-    return df
+def get_rosters(settings: Settings, user_ids: list[int] | None = None) -> pd.DataFrame:
+    query = "SELECT * from rosters"
+    params: tuple[int, ...] = ()
 
-def get_user_rosters(settings: Settings, user_id: int) -> pd.DataFrame:
+    if user_ids:
+        placeholders = ", ".join(["?" for _ in user_ids])
+        query += f" WHERE user_id IN ({placeholders})"
+        params = tuple(user_ids)
+
     with sqlite3.connect(settings.db_name) as conn:
-        df = pd.read_sql_query(f"""
-            SELECT * FROM rosters
-            WHERE user_id = {user_id}""",
-            conn,
-        )
-    return df
+        return pd.read_sql_query(query, conn, params=params)
 
