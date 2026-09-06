@@ -8,7 +8,7 @@ from sleeper_super.config import Settings
 
 @dataclass
 class User:
-    user_id: int
+    id: int
     display_name: str
 
 def init_users(settings: Settings) -> None:
@@ -16,7 +16,7 @@ def init_users(settings: Settings) -> None:
     with sqlite3.connect(settings.db_name) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY,
                 display_name TEXT NOT NULL
             )
         """)
@@ -30,8 +30,8 @@ def init_users(settings: Settings) -> None:
 
         for user in users:
             conn.execute("""
-                INSERT INTO users (user_id, display_name) VALUES (?, ?)
-                ON CONFLICT (user_id)
+                INSERT INTO users (id, display_name) VALUES (?, ?)
+                ON CONFLICT (id)
                 DO UPDATE SET display_name = excluded.display_name
                 """,
                 (user["user_id"], user["display_name"])
